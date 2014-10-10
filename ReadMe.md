@@ -1,7 +1,6 @@
 
 How to use
------------
------------
+==========
 
 Setup
 -----
@@ -17,7 +16,6 @@ Setup
         {
             [[MopubBannerSingleton sharedBanners] mopubEnterBackground];
         }
-
 
         - (void)applicationWillEnterForeground:(UIApplication *)application
         {
