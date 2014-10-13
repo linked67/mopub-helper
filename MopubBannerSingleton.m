@@ -57,7 +57,9 @@
         }
         
         self.adView.delegate = (id)self;
-        [self.adView loadAd];
+        if (AdsEnabled) {
+            [self.adView loadAd];
+        }
    
     }
     
@@ -311,11 +313,11 @@
 }
 
 - (void)adViewDidFailToLoadAd:(MPAdView *)view{
-    NSLog(@"(MopubBannerSingletone) adViewDidFailToLoadAd");
+    //NSLog(@"(MopubBannerSingletone) adViewDidFailToLoadAd");
 }
 
 - (UIViewController *)viewControllerForPresentingModalView {
-    NSLog(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
+    //NSLog(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
     return actualBannerController;
 }
 
@@ -354,6 +356,7 @@
 
 
 - (void)moveBannerOnScreen {
+    //NSLog(@"moveBannerOnScreen");
     
     [actualBannerController.view layoutIfNeeded];
     

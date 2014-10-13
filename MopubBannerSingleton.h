@@ -27,6 +27,7 @@
 
 #define ExtraSpace 0.0f           // some more space between ad and other view
 #define AppearAnimationTime 0.5f  // seconds
+#define AdsEnabled YES             // YES or NO 
 
 // -------------------------------
 
