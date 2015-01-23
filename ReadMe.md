@@ -1,3 +1,4 @@
+New version 4 with Admob fallback (interstitial and banners)
 
 How to use
 ==========
@@ -7,7 +8,7 @@ Setup
 
 * Make a constraint in Interface Builder between top (or bottom) layout guide and a view you want to move to give the Banner some space.
 
-* Fill the Mopub keys in MopubKeys.h
+* Fill the Mopub and Admob keys in MopubKeys.h (Change some params if you want)
 
 * In the App delegate put code like this to enable this helper:
 
