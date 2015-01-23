@@ -4,65 +4,70 @@
 //  Created by bruno heitz on 28/09/13.
 //  Copyright (c) 2013 bruno heitz. All rights reserved.
 //
+//  V 4.0
 //
 //  --------------------- How to use ------------------------------
 //
 //  Only need a constraint in Interface Builder between
 //  top (or bottom) layout guide and a view
 //
-//  And put this somewhere, here or in a special header you import
-//
-//  #define kMopubIphoneBanner                  @"PutYourKeyHere"
-//  #define kMopubIphoneInterstitialPortrait    @"PutYourKeyHere"
-//  #define kMopubIphoneInterstitialLandscape   @"PutYourKeyHere"
-//
-//  #define kMopubTabletLeaderboard             @"PutYourKeyHere"
-//  #define kMopubTabletInterstitialPortrait    @"PutYourKeyHere"
-//  #define kMopubTabletInterstitialLandscape   @"PutYourKeyHere"
+//  Fill the MopubKeys file with good settings
 //
 //  -----------------------------------------------------------------
-//
-
-// -- Params to adjust if need --
-
-#define ExtraSpace 0.0f           // some more space between ad and other view
-#define AppearAnimationTime 0.5f  // seconds
-#define AdsEnabled YES             // YES or NO 
-
-// -------------------------------
 
 #import <Foundation/Foundation.h>
 
 #import "MPAdView.h"
 #import "MPInterstitialAdController.h"
 
-// header with the keys
+// header with the keys and params
 #import "MopubKeys.h"
 
+// Admob interstitial
+#import "GADInterstitial.h"
+#import "GADInterstitialDelegate.h"
 
-@interface MopubBannerSingleton : UIViewController <MPAdViewDelegate, MPInterstitialAdControllerDelegate>{
+// Admob banner
+#import "GADBannerView.h"
+#import "GADRequest.h"
 
-    UIViewController *actualBannerController, *actualInterstitialController;
+
+
+
+@interface MopubBannerSingleton : UIViewController <MPAdViewDelegate, MPInterstitialAdControllerDelegate, GADInterstitialDelegate>{
+
+    UIViewController *actualBannerController;
+    NSNumber *currentMinimumIntervalTimeInMinutes;
+    NSString *currentAdmobInterstitialID;
+    
     BOOL isOnTopOfTheScreen, hadBanner;
     
     NSLayoutConstraint *constraintControllerPushingOtherViews, *constraintAdviewToGuide;
     CGFloat bannerHeight;
+    
+    //for admob
+    NSTimer *timer;
+    NSInteger timeCounter;
+    NSDate *pauseStart, *previousFireDate;
 }
 
 + (MopubBannerSingleton *)sharedBanners;
+
 - (void)getMopubBanner:(UIViewController *)controller onTop:(BOOL)onTop constraint:(NSLayoutConstraint *)constraint;
-- (void)getAndShowInterstitial:(UIViewController *)controller every:(NSInteger)interstitialCount;
-- (void)setupAdFrame:(UIViewController *)controller;
-- (void)stopBanner;
+- (void)getAndShowInterstitialWithMinimumTimeIntervalInMinutes:(NSNumber *)minimumIntervalTimeInMinutes;
+- (void)getAndShowInterstitialEvery:(NSInteger)interstitialCount;
 
-- (void)mopubEnterForeground;
-- (void)mopubEnterBackground;
 
-// Banner
-@property (nonatomic, retain) MPAdView *adView;
+// Mopub and Admob Banner
+@property (nonatomic, retain) id adView;
 
-// Interstitial
+// Mopub Interstitial
 @property (nonatomic, retain) MPInterstitialAdController *interstitial;
+
+// Admob interstitial
+@property(nonatomic, strong) GADInterstitial *admobInterstitial;
+
+@property (nonatomic) BOOL isAdsEnabled;
 
 
 @end
