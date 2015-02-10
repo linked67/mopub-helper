@@ -4,7 +4,7 @@
 //  Created by bruno heitz on 28/09/13.
 //  Copyright (c) 2013 bruno heitz. All rights reserved.
 //
-//  V 4.0
+//  V 4.7
 //
 //  --------------------- How to use ------------------------------
 //
@@ -36,13 +36,13 @@
 
 @interface MopubBannerSingleton : UIViewController <MPAdViewDelegate, MPInterstitialAdControllerDelegate, GADInterstitialDelegate>{
 
-    UIViewController *actualBannerController;
+    __weak UIViewController *actualBannerController;
     NSNumber *currentMinimumIntervalTimeInMinutes;
     NSString *currentAdmobInterstitialID;
     
     BOOL isOnTopOfTheScreen, hadBanner;
     
-    NSLayoutConstraint *constraintControllerPushingOtherViews, *constraintAdviewToGuide;
+    __weak NSLayoutConstraint *constraintControllerPushingOtherViews, *constraintAdviewToGuide;
     CGFloat bannerHeight;
     
     //for admob
@@ -56,10 +56,12 @@
 - (void)getMopubBanner:(UIViewController *)controller onTop:(BOOL)onTop constraint:(NSLayoutConstraint *)constraint;
 - (void)getAndShowInterstitialWithMinimumTimeIntervalInMinutes:(NSNumber *)minimumIntervalTimeInMinutes;
 - (void)getAndShowInterstitialEvery:(NSInteger)interstitialCount;
+- (void)mopubBannerShouldDissapear:(UIViewController *)controller;
 
+- (void)removeBanners;
 
 // Mopub and Admob Banner
-@property (nonatomic, retain) id adView;
+@property (nonatomic, strong) id adView;
 
 // Mopub Interstitial
 @property (nonatomic, retain) MPInterstitialAdController *interstitial;

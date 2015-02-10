@@ -10,11 +10,19 @@
 #import "MopubBannerSingleton.h"
 
 #import "AppDelegate.h"
+#import "Constants.h"
+
+
+
+// below imports
+static int ddLogLevel = LOG_LEVEL_VERBOSE;
+
 
 @implementation MopubBannerSingleton
 
 @synthesize adView;
 @synthesize isAdsEnabled;
+//@synthesize actualBannerController;
 
 +(MopubBannerSingleton *)sharedBanners{
     static dispatch_once_t pred;
@@ -70,81 +78,100 @@
 }
 
 - (void)bannerMustAdjustAfterScreenRotate{
-    [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
+    DDLogVerbose(@"bannerMustAdjustAfterScreenRotate");
+    if (actualBannerController) {
+        [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
+    }
 }
 -(void)getMopubBanner:(UIViewController *)controller onTop:(BOOL)onTop constraint:(NSLayoutConstraint *)constraint {
+    DDLogVerbose(@"getmopub banner");
     
-    // Keep some data for later
-    actualBannerController = controller;
-    isOnTopOfTheScreen = onTop;
-    constraintControllerPushingOtherViews = constraint;
-    
-    // Create a new banner
-    if (adView == nil) {
+    // check for controller again just to be safe
+    if (isAdsEnabled && controller) {
+        // Keep some data for later
+        actualBannerController = controller;
+        isOnTopOfTheScreen = onTop;
+        constraintControllerPushingOtherViews = constraint;
         
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubTabletLeaderboard
-                                                        size:MOPUB_LEADERBOARD_SIZE];
-        }else{
-            self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubIphoneBanner
-                                                        size:MOPUB_BANNER_SIZE];
-        }
-        
-        [(MPAdView *)self.adView setDelegate:(id)self];
-        if (isAdsEnabled) {
+        // Create a new banner
+        if (adView == nil) {
+            
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubTabletLeaderboard
+                                                            size:MOPUB_LEADERBOARD_SIZE];
+            }else{
+                self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubIphoneBanner
+                                                            size:MOPUB_BANNER_SIZE];
+            }
+            
+            [(MPAdView *)self.adView setDelegate:(id)self];
+            
+            
             [self.adView loadAd];
-        }
-   
-    }
-    
-    [self.adView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    
-   
-    if ([adView isKindOfClass:[MPAdView class]]) {
-        // Search if there is a Mopub Ad in the controller
-        BOOL isMopubFound = false;
-        for (UIView *subView in [controller.view subviews]) {
-            if ([subView isKindOfClass:[MPAdView class]]) {
-                isMopubFound = true;
-            }
-        }
-        
-        // if no Mopub Ad in this controller, add one and setup the frame
-        if (!isMopubFound) {
-            [controller.view addSubview:adView];
             
-            // must be after addsubview
-            [self setupAdFrame:controller];
-        }
-        
-        [self.adView startAutomaticallyRefreshingContents];
-   
-    }else if ([adView isKindOfClass:[GADBannerView class]]){
-        // Search if there is a Admob Ad in the controller
-        
-        BOOL isAdmobFound = false;
-        for (UIView *subView in [controller.view subviews]) {
-            if ([subView isKindOfClass:[GADBannerView class]]) {
-                isAdmobFound = true;
-            }
-        }
-        
-        // if no Admob Ad in this controller, add one and setup the frame
-        if (!isAdmobFound) {
-            [controller.view addSubview:adView];
             
-            // must be after addsubview
-            [self setupAdFrame:controller];
         }
+        
+        [self.adView setTranslatesAutoresizingMaskIntoConstraints:NO];
+        
+        
+        if ([adView isKindOfClass:[MPAdView class]]) {
+            // Search if there is a Mopub Ad in the controller
+            BOOL isMopubFound = false;
+            for (UIView *subView in [controller.view subviews]) {
+                if ([subView isKindOfClass:[MPAdView class]]) {
+                    isMopubFound = true;
+                    DDLogVerbose(@"(MopubBannerSingleton) Mopub banner found into view");
+                }
+            }
+            
+            // if no Mopub Ad in this controller, add one and setup the frame
+            if (!isMopubFound) {
+                DDLogVerbose(@"(MopubBannerSingleton) Mopub banner not found into view, adding");
+                [controller.view addSubview:adView];
+                
+                // must be after addsubview
+                [self setupAdFrame:controller];
+            }
+            
+            
+            [self.adView startAutomaticallyRefreshingContents];
+            
+        }else if ([adView isKindOfClass:[GADBannerView class]]){
+            // Search if there is a Admob Ad in the controller
+            
+            BOOL isAdmobFound = false;
+            for (UIView *subView in [controller.view subviews]) {
+                if ([subView isKindOfClass:[GADBannerView class]]) {
+                    isAdmobFound = true;
+                    DDLogVerbose(@"(MopubBannerSingleton) Admob banner found into view");
+                    //[self.adView removeFromSuperview];
+                }
+            }
+            
+            // if no Admob Ad in this controller, add one and setup the frame
+            if (!isAdmobFound) {
+                DDLogVerbose(@"(MopubBannerSingleton) Admob banner not found into view, adding");
+                [controller.view addSubview:adView];
+                
+                // must be after addsubview
+                [self setupAdFrame:controller];
+            }
+            
+        }
+        
+        [self.adView setHidden:NO];
 
-    }
     
-    [self.adView setHidden:NO];
-
+        
+    }else{
+        [self.adView setHidden:YES];
+    }
 }
 
 - (void)setupAdFrame:(UIViewController *)controller{
-    
+    //DDLogVerbose(@"setupAdFrame");
+
     // center X
     [controller.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.adView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f]];
     
@@ -273,6 +300,7 @@
     
     NSNumber *elapsed = [NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970] - [lastInterstitialTime longValue]];
     
+    DDLogVerbose(@"elapsed since last interstitial:%li", [elapsed longValue]);
     if ([elapsed longValue] >= ([currentMinimumIntervalTimeInMinutes longValue] * 60.0) ) {
         return YES;
     }
@@ -281,45 +309,50 @@
 }
 
 - (void)getAndShowInterstitialWithMinimumTimeIntervalInMinutes:(NSNumber *)minimumIntervalTimeInMinutes{
-   
-    currentMinimumIntervalTimeInMinutes = minimumIntervalTimeInMinutes;
+   // DDLogVerbose(@"++ getAndShowInterstitialWithMinimumTimeIntervalInMinutes ++");
     
-    if ([self isInterstitialElapsedTimeOver]) {
+    if (isAdsEnabled) {
+    
+        currentMinimumIntervalTimeInMinutes = minimumIntervalTimeInMinutes;
         
-        self.interstitial = nil;
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            // The device is an iPad running iPhone 3.2 or later.
-            if ([self isPortrait]) {
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialPortrait];
-                currentAdmobInterstitialID = kAdmobTabletInterstitialProtrait;
-            }else{
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialLandscape];
-                currentAdmobInterstitialID = kAdmobTabletInterstitialLandscape;
+        if ([self isInterstitialElapsedTimeOver]) {
+            
+            self.interstitial = nil;
+            
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                // The device is an iPad running iPhone 3.2 or later.
+                if ([self isPortrait]) {
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialPortrait];
+                    currentAdmobInterstitialID = kAdmobTabletInterstitialProtrait;
+                }else{
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialLandscape];
+                    currentAdmobInterstitialID = kAdmobTabletInterstitialLandscape;
+                }
+                
+            }else {
+                // The device is an iPhone or iPod touch.
+                if ([self isPortrait]) {
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialPortrait];
+                    currentAdmobInterstitialID = kAdmobIphoneInterstitialProtrait;
+                }else{
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialLandscape];
+                    currentAdmobInterstitialID = kAdmobIphoneInterstitialLandscape;
+                }
             }
             
-        }else {
-            // The device is an iPhone or iPod touch.
-            if ([self isPortrait]) {
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialPortrait];
-                currentAdmobInterstitialID = kAdmobIphoneInterstitialProtrait;
-            }else{
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialLandscape];
-                currentAdmobInterstitialID = kAdmobIphoneInterstitialLandscape;
-            }
-        }
-        
-        self.interstitial.delegate = self;
-        
-        // Fetch the interstitial ad.
-        if (isAdsEnabled) {
+            self.interstitial.delegate = self;
+            
+            // Fetch the interstitial ad.
+            
             [self.interstitial loadAd];
+            
+            
+            
+        }else{
+            // do nothing, just wait
+            // TODO: write a timer that check if we are over the time and fire interstitial or not ?
+            
         }
-        
-        
-    }else{
-        // do nothing, just wait
-        // TODO: write a timer that check if we are over the time and fire interstitial or not ?
         
     }
     
@@ -328,12 +361,13 @@
 
 
 // use every:1 to display a interstitial every time this method is called
+//- (void)getAndShowInterstitial:(UIViewController *)controller every:(NSInteger)interstitialCount{
 - (void)getAndShowInterstitialEvery:(NSInteger)interstitialCount{
     
     // Get the interstitial count
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger mopubInterstitialCount = [[defaults objectForKey:kInterstitialCount] integerValue]+1;
-    
+    //DDLogVerbose(@"getAndShowInterstitial current count:%li every:%li", (long)mopubInterstitialCount, (long)interstitialCount);
     if (mopubInterstitialCount >= interstitialCount) {
         
         //actualInterstitialController = controller;
@@ -379,7 +413,7 @@
 // Do we need this ?
 /*
 - (void)stopBanner{
-    //NSLog(@"banner stoped and removed from superview");
+    //DDLogVerbose(@"banner stoped and removed from superview");
     [self.adView removeFromSuperview];
     self.adView.delegate = nil;
     self.adView = nil;
@@ -388,6 +422,7 @@
 */
 
 - (void)disableMopubBanner{
+    //DDLogVerbose(@"banner disabled and removed from superview");
     [self.adView removeFromSuperview];
     [(MPAdView *)self.adView setDelegate:nil];
     self.adView = nil;
@@ -403,48 +438,77 @@
 #pragma mark - App delegate Foreground / backbroung
 
 - (void)mopubAppDidBecomeActive{
-    if(AutoShowInterstitial){
+   // DDLogVerbose(@"** mopubAppDidBecomeActive **");
+    if(AutoShowInterstitial && isAdsEnabled){
         [self performSelector:@selector(getAndShowInterstitialWithMinimumTimeIntervalInMinutes:) withObject:[NSNumber numberWithLong:AutoInterstitialTimeBetweenEachInMinutes] afterDelay:AutoInterstitialDelayAfterAppBecomeActive];
-        //[self getAndShowInterstitialWithMinimumTimeIntervalInMinutes:[NSNumber numberWithLong:AutoInterstitialTimeBetweenEachInMinutes]];
     }
 }
 
 
 - (void)mopubAppDidFinishLaunching{
-   
+   // DDLogVerbose(@"** mopubAppDidFinishLaunching **");
 }
 
 - (void)mopubEnterForeground{
-    
-    if ([adView isKindOfClass:[MPAdView class]]) {
-        [self.adView startAutomaticallyRefreshingContents];
-    }else if ([adView isKindOfClass:[GADBannerView class]]){
-        [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
-        if (timer) {
-            [self resumeTimer:timer];
+    DDLogVerbose(@"** mopubEnterForeground **");
+    if (isAdsEnabled) {
+        if (actualBannerController) {
+            if ([adView isKindOfClass:[MPAdView class]]) {
+                [self.adView startAutomaticallyRefreshingContents];
+            }else if ([adView isKindOfClass:[GADBannerView class]]){
+                [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
+                if (timer) {
+                    [self resumeTimer:timer];
+                }else{
+                    DDLogVerbose(@"wow no timer to resume ????");
+                }
+            }
+            
+        }
+    }else{
+        if (self.adView) {
+            [self.adView setHidden:YES];
         }
     }
     
 }
 - (void)mopubEnterBackground{
+    DDLogVerbose(@"mopubEnterBackground");
+    if (self.adView) {
+        if ([adView isKindOfClass:[MPAdView class]]) {
+            [self.adView stopAutomaticallyRefreshingContents];
+        }else if ([adView isKindOfClass:[GADBannerView class]]){
+            [self disableAdmobBanner];
+            if (timer) {
+                [self pauseTimer:timer];
+            }else{
+                DDLogVerbose(@"wow no timer to pause ????");
+            }
+        }
+    }
+}
+
+- (void)mopubBannerShouldDissapear:(UIViewController *)controller{
+    DDLogVerbose(@"(MopubBannerSingletone) mopubBannerShouldDissapear");
+    if ([adView superview]) {
+        [adView removeFromSuperview];
+        DDLogVerbose(@"(MopubBannerSingletone) mopubBannerShouldDissapear REMOVED");
+    }
     
     if ([adView isKindOfClass:[MPAdView class]]) {
         [self.adView stopAutomaticallyRefreshingContents];
-    }else if ([adView isKindOfClass:[GADBannerView class]]){
-        [self disableAdmobBanner];
-        if (timer) {
-            [self pauseTimer:timer];
-        }
     }
 }
 
 #pragma mark - Mopub Banner Delegate
 
 - (void)adViewDidLoadAd:(MPAdView *)view{
-    
+    DDLogVerbose(@"(MopubBannerSingletone) Mopub adViewDidLoadAd");
+   
     if (constraintControllerPushingOtherViews.constant == 0) {
         // constraint must give some space to the banner
-        if (isAdsEnabled) {
+       // DDLogVerbose(@"call mobeBannerOnScreen");
+        if (isAdsEnabled && actualBannerController) {
             [self moveBannerOnScreen];
         }
     }
@@ -453,85 +517,105 @@
 }
 
 - (void)adViewDidFailToLoadAd:(MPAdView *)view{
+    DDLogVerbose(@"(MopubBannerSingletone) Mopub adViewDidFailToLoadAd - ask admob");
     [self createAdmobBanner];
 }
 
 - (UIViewController *)viewControllerForPresentingModalView {
+    //DDLogVerbose(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
     return actualBannerController;
 }
 
 #pragma mark - Mopub Interstitial Delegate
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial{
-    
-    if (self.interstitial.ready){
-        if ([self isInterstitialElapsedTimeOver]) {
-            if (isAdsEnabled) {
+    //DDLogVerbose(@"----------- mopub interstitialDidLoadAd ----------");
+    if (isAdsEnabled) {
+        if (self.interstitial.ready){
+            if ([self isInterstitialElapsedTimeOver]) {
+                
                 [self saveLastInterstitialTimestampDisplayed];
                 [self.interstitial showFromViewController:[[UIApplication sharedApplication] delegate].window.rootViewController];
             }
+            
+        }else {
+            //DDLogVerbose(@"----------- The interstitial wasn't ready ----------");
+            // The interstitial wasn't ready, so continue as usual.
         }
     }
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial{
-    [self createAndLoadAdmobInterstitial];
+    //DDLogVerbose(@"-- error interstitialDidFailToLoadAd - loading admob fallback -");
+    if (isAdsEnabled) {
+        [self createAndLoadAdmobInterstitial];
+    }
 }
 
 #pragma mark - Admob init
 
 - (void)createAdmobBanner{
+    DDLogVerbose(@"createAdmobBanner");
     [self disableMopubBanner];
     
-    if (adView == nil) {
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    if (isAdsEnabled  && actualBannerController) {
+        if (adView == nil) {
             
-            self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeLeaderboard];
-            [self.adView setAdUnitID:kAdmobTabletLeaderboard];
-        }else{
-            self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];
-            [self.adView setAdUnitID:kAdmobIphoneBanner];
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                
+                self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeLeaderboard];
+                [self.adView setAdUnitID:kAdmobTabletLeaderboard];
+            }else{
+                self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];
+                [self.adView setAdUnitID:kAdmobIphoneBanner];
+            }
+            
+            [(GADBannerView *)self.adView setDelegate:(id)self];
+            if (isAdsEnabled) {
+                [self.adView setRootViewController:actualBannerController];
+                
+                GADRequest *request = [GADRequest request];
+                // Enable test ads on simulators.
+                request.testDevices = @[ GAD_SIMULATOR_ID ];
+                [(GADBannerView *)self.adView loadRequest:request];
+                
+            }
+            
         }
         
-        [(GADBannerView *)self.adView setDelegate:(id)self];
-        if (isAdsEnabled) {
-            [self.adView setRootViewController:actualBannerController];
-            
-            GADRequest *request = [GADRequest request];
-            // Enable test ads on simulators.
-            request.testDevices = @[ GAD_SIMULATOR_ID ];
-            [(GADBannerView *)self.adView loadRequest:request];
-            
-        }
+        [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
         
     }
     
-    [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
     
 }
 
 - (void)createAndLoadAdmobInterstitial{
-    self.admobInterstitial = [[GADInterstitial alloc] init];
-    self.admobInterstitial.delegate = (id)self;
-    self.admobInterstitial.adUnitID = currentAdmobInterstitialID;
-    
-    GADRequest *request = [GADRequest request];
-    
-    // Requests test ads on simulators.
-    request.testDevices = @[ GAD_SIMULATOR_ID ];
-    
-    [self.admobInterstitial loadRequest:request];
+    if (isAdsEnabled) {
+        self.admobInterstitial = [[GADInterstitial alloc] init];
+        self.admobInterstitial.delegate = (id)self;
+        self.admobInterstitial.adUnitID = currentAdmobInterstitialID;
+        
+        GADRequest *request = [GADRequest request];
+        
+        // Requests test ads on simulators.
+        request.testDevices = @[ GAD_SIMULATOR_ID ];
+        
+        [self.admobInterstitial loadRequest:request];
+    }
 
 }
 
 #pragma mark - admob Banner delegate
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView{
+    DDLogVerbose(@"admob banner - adViewDidReceiveAd");
     
-    if (isAdsEnabled) {
+    if (isAdsEnabled && actualBannerController) {
         if (constraintControllerPushingOtherViews.constant == 0) {
+        // DDLogVerbose(@"call mobeBannerOnScreen");
             [self moveBannerOnScreen];
+            
         }
         [self startTimer];
     }
@@ -540,7 +624,7 @@
     
 }
 - (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error{
-   
+    DDLogVerbose(@"admob banner - didFailToReceiveAdWithError");
 }
 
 
@@ -548,11 +632,13 @@
 
 /// Called when an interstitial ad request succeeded.
 - (void)interstitialDidReceiveAd:(GADInterstitial *)ad {
-    if ([self.admobInterstitial isReady]) {
-        if ([self isInterstitialElapsedTimeOver]) {
-            if (isAdsEnabled) {
+    //DDLogVerbose(@"ADMOB - interstitialDidReceiveAd");
+    if (isAdsEnabled) {
+        if ([self.admobInterstitial isReady]) {
+            if ([self isInterstitialElapsedTimeOver]) {
                 [self saveLastInterstitialTimestampDisplayed];
                 [self.admobInterstitial presentFromRootViewController:[[UIApplication sharedApplication] delegate].window.rootViewController];
+                
             }
         }
     }
@@ -561,7 +647,7 @@
 
 /// Called when an interstitial ad request failed.
 - (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
-    
+    //DDLogVerbose(@"ADMOB - interstitialDidFailToReceiveAdWithError: %@", [error localizedDescription]);
 }
 
 
@@ -585,30 +671,33 @@
 
 
 - (void)moveBannerOnScreen {
-    
-    [actualBannerController.view layoutIfNeeded];
-    
-    constraintControllerPushingOtherViews.constant = abs(bannerHeight);
-    constraintAdviewToGuide.constant = 0.0f;
-    
-    
-    // Animate linear
-    [UIView animateWithDuration:AppearAnimationTime
-                     animations:^{
-                         [actualBannerController.view layoutIfNeeded]; // Called on parent view
-                     }];
-    
-    
-    /* // Animate bounce
-    [UIView animateWithDuration:AppearAnimationTime delay:0
+    //DDLogVerbose(@"moveBannerOnScreen");
+    if (isAdsEnabled && actualBannerController) {
+        [actualBannerController.view layoutIfNeeded];
+        
+        constraintControllerPushingOtherViews.constant = abs(bannerHeight);
+        constraintAdviewToGuide.constant = 0.0f;
+        
+        
+        // Animate linear
+        [UIView animateWithDuration:AppearAnimationTime
+                         animations:^{
+                             [actualBannerController.view layoutIfNeeded]; // Called on parent view
+                         }];
+        
+        
+        /* // Animate bounce
+         [UIView animateWithDuration:AppearAnimationTime delay:0
          usingSpringWithDamping:0.3 initialSpringVelocity:0.0f
-                        options:0 animations:^{
-                            [actualBannerController.view layoutIfNeeded]; // Called on parent view
-                            
-                        } completion:nil];
-    
-    */
-    //bannerIsVisible = TRUE;
+         options:0 animations:^{
+         [actualBannerController.view layoutIfNeeded]; // Called on parent view
+         
+         } completion:nil];
+         
+         */
+        //bannerIsVisible = TRUE;
+
+    }
 }
 
 #pragma mark - Other
@@ -642,8 +731,11 @@
 #pragma mark - Admob timer
 
 - (void)startTimer{
-    [self stopTimer];
-    timer = [NSTimer scheduledTimerWithTimeInterval:AdmobRefreshInterval target:self selector:@selector(admobTimerTick) userInfo:nil repeats:NO];
+    DDLogVerbose(@"-- start admob timer --");
+    if (isAdsEnabled) {
+        [self stopTimer];
+        timer = [NSTimer scheduledTimerWithTimeInterval:AdmobRefreshInterval target:self selector:@selector(admobTimerTick) userInfo:nil repeats:NO];
+    }
     
 }
 
@@ -653,26 +745,44 @@
 }
 
 - (void)admobTimerTick {
-    GADRequest *request = [GADRequest request];
-    // Enable test ads on simulators.
-    request.testDevices = @[ GAD_SIMULATOR_ID ];
-    [(GADBannerView *)self.adView loadRequest:request];
+    DDLogVerbose(@"admob tick ask another banner");
+    if (actualBannerController) {
+        [self.adView setRootViewController:actualBannerController];
+        
+        GADRequest *request = [GADRequest request];
+        // Enable test ads on simulators.
+        request.testDevices = @[ GAD_SIMULATOR_ID ];
+        [(GADBannerView *)self.adView loadRequest:request];
+    }
     
 }
 
 - (void)pauseTimer:(NSTimer *)mTimer {
+    DDLogVerbose(@"-- pause admob timer --");
     pauseStart = [NSDate dateWithTimeIntervalSinceNow:0];
     previousFireDate = [mTimer fireDate];
     [mTimer setFireDate:[NSDate distantFuture]];
 }
 
 - (void)resumeTimer:(NSTimer *)mTimer {
+    DDLogVerbose(@"-- resume admob timer --");
     float pauseTime = -1*[pauseStart timeIntervalSinceNow];
     [mTimer setFireDate:[previousFireDate initWithTimeInterval:pauseTime sinceDate:previousFireDate]];
     
+    //[pauseStart release];
+    
+    //[previousFireDate release];
 }
 
-
+- (void)removeBanners{
+    isAdsEnabled = NO;
+    if (self.adView) {
+        [self.adView setDelegate:nil];
+        [self.adView removeFromSuperview];
+        self.adView = nil;
+        
+    }
+}
 
 
 @end
