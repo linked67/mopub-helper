@@ -13,9 +13,14 @@ Setup
 * In the App delegate put code like this to enable this helper:
 
 
-        - (void)applicationDidBecomeActive:(UIApplication *)application
-        {
-            [MopubBannerSingleton sharedBanners];
+        - (void)viewWillAppear:(BOOL)animated{
+           [super viewWillAppear:animated];
+           [[MopubBannerSingleton sharedBanners] getMopubBanner:self onTop:NO constraint:_constraintForAdSpace];
+        }
+
+        - (void)viewWillDisappear:(BOOL)animated{
+           [super viewWillDisappear:animated];
+           [[MopubBannerSingleton sharedBanners] mopubBannerShouldDissapear:self];
         }
 
 
