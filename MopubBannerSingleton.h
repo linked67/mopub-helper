@@ -4,7 +4,7 @@
 //  Created by bruno heitz on 28/09/13.
 //  Copyright (c) 2013 bruno heitz. All rights reserved.
 //
-//  V 4.0
+//  V 4.7
 //
 //  --------------------- How to use ------------------------------
 //
