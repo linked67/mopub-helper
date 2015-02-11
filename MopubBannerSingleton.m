@@ -116,6 +116,9 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
         
         
         if ([adView isKindOfClass:[MPAdView class]]) {
+            
+            [(MPAdView *)self.adView setDelegate:(id)self];
+            
             // Search if there is a Mopub Ad in the controller
             BOOL isMopubFound = false;
             for (UIView *subView in [controller.view subviews]) {
@@ -139,6 +142,9 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
             
         }else if ([adView isKindOfClass:[GADBannerView class]]){
             // Search if there is a Admob Ad in the controller
+            
+            [(GADBannerView *)self.adView setDelegate:(id)self];
+            [(GADBannerView *)self.adView setRootViewController:actualBannerController];
             
             BOOL isAdmobFound = false;
             for (UIView *subView in [controller.view subviews]) {
@@ -497,7 +503,13 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
     
     if ([adView isKindOfClass:[MPAdView class]]) {
         [self.adView stopAutomaticallyRefreshingContents];
+        [(MPAdView *)self.adView setDelegate:nil];
+    }else if ([adView isKindOfClass:[GADBannerView class]]){
+        [(GADBannerView *)self.adView setDelegate:nil];
+        [(GADBannerView *)self.adView setRootViewController:nil];
+        
     }
+    
 }
 
 #pragma mark - Mopub Banner Delegate
@@ -522,7 +534,7 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
 }
 
 - (UIViewController *)viewControllerForPresentingModalView {
-    //DDLogVerbose(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
+    DDLogVerbose(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
     return actualBannerController;
 }
 
@@ -572,7 +584,7 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
             
             [(GADBannerView *)self.adView setDelegate:(id)self];
             if (isAdsEnabled) {
-                [self.adView setRootViewController:actualBannerController];
+                [(GADBannerView *)self.adView setRootViewController:actualBannerController];
                 
                 GADRequest *request = [GADRequest request];
                 // Enable test ads on simulators.
