@@ -15,7 +15,8 @@
 
 
 // below imports
-static int ddLogLevel = LOG_LEVEL_VERBOSE;
+//static int ddLogLevel = LOG_LEVEL_VERBOSE;
+static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 
 @implementation MopubBannerSingleton
@@ -95,6 +96,8 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
         
         // Create a new banner
         if (adView == nil) {
+            
+            //[self createAdmobBanner];
             
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
                 self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubTabletLeaderboard
@@ -503,9 +506,9 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
     
     if ([adView isKindOfClass:[MPAdView class]]) {
         [self.adView stopAutomaticallyRefreshingContents];
-        [(MPAdView *)self.adView setDelegate:nil];
+        //[(MPAdView *)self.adView setDelegate:nil];
     }else if ([adView isKindOfClass:[GADBannerView class]]){
-        [(GADBannerView *)self.adView setDelegate:nil];
+        //[(GADBannerView *)self.adView setDelegate:nil];
         [(GADBannerView *)self.adView setRootViewController:nil];
         
     }
@@ -683,7 +686,7 @@ static int ddLogLevel = LOG_LEVEL_VERBOSE;
 
 
 - (void)moveBannerOnScreen {
-    //DDLogVerbose(@"moveBannerOnScreen");
+    DDLogVerbose(@"moveBannerOnScreen, banner height:%i", abs(bannerHeight));
     if (isAdsEnabled && actualBannerController) {
         [actualBannerController.view layoutIfNeeded];
         
