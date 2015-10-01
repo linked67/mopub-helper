@@ -17,28 +17,28 @@
 	<key>AdmobRefreshInterval</key>
 	<integer>60</integer>
 	<key>kMopubIphoneBanner</key>
-	<string>0f5aef2ec3cb11e295fa123138070049</string>
+	<string></string>
 	<key>kMopubIphoneInterstitialPortrait</key>
-	<string>1c37c618c3cb11e295fa123138070049</string>
+	<string></string>
 	<key>kMopubIphoneInterstitialLandscape</key>
-	<string>9fdadacd7fa84002967c2b4a1eaad0f2</string>
+	<string></string>
 	<key>kMopubTabletLeaderboard</key>
-	<string>d33fd41efbf24781b9a645e7791b1d7b</string>
+	<string></string>
 	<key>kMopubTabletInterstitialPortrait</key>
-	<string>0c7a2330571649378586df400261c143</string>
+	<string></string>
 	<key>kMopubTabletInterstitialLandscape</key>
-	<string>1df89bd531b04006bb84b0985d91c4bf</string>
+	<string></string>
 	<key>kAdmobIphoneBanner</key>
-	<string>ca-app-pub-4607823378897293/8976542968</string>
+	<string></string>
 	<key>kAdmobTabletLeaderboard</key>
-	<string>ca-app-pub-4607823378897293/2033387367</string>
+	<string></string>
 	<key>kAdmobIphoneInterstitialProtrait</key>
-	<string>ca-app-pub-4607823378897293/1453276167</string>
+	<string></string>
 	<key>kAdmobIphoneInterstitialLandscape</key>
-	<string>ca-app-pub-4607823378897293/6463586967</string>
+	<string></string>
 	<key>kAdmobTabletInterstitialProtrait</key>
-	<string>ca-app-pub-4607823378897293/9417053366</string>
+	<string></string>
 	<key>kAdmobTabletInterstitialLandscape</key>
-	<string>ca-app-pub-4607823378897293/3370519766</string>
+	<string></string>
 </dict>
 </plist>
