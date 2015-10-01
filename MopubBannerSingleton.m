@@ -10,14 +10,6 @@
 #import "MopubBannerSingleton.h"
 
 #import "AppDelegate.h"
-#import "Constants.h"
-
-
-
-// below imports
-//static int ddLogLevel = DDLogLevelAll;
-static int ddLogLevel = DEFAULT_LOG_LEVEL;
-
 
 @implementation MopubBannerSingleton
 
@@ -79,13 +71,13 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 }
 
 - (void)bannerMustAdjustAfterScreenRotate{
-    DDLogVerbose(@"bannerMustAdjustAfterScreenRotate");
+    NSlog(@"bannerMustAdjustAfterScreenRotate");
     if (actualBannerController) {
         [self getMopubBanner:actualBannerController onTop:isOnTopOfTheScreen constraint:constraintControllerPushingOtherViews];
     }
 }
 -(void)getMopubBanner:(UIViewController *)controller onTop:(BOOL)onTop constraint:(NSLayoutConstraint *)constraint {
-    DDLogVerbose(@"getmopub banner");
+    NSLog(@"getmopub banner");
     
     // check for controller again just to be safe
     if (isAdsEnabled && controller) {
@@ -127,13 +119,13 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
             for (UIView *subView in [controller.view subviews]) {
                 if ([subView isKindOfClass:[MPAdView class]]) {
                     isMopubFound = true;
-                    DDLogVerbose(@"(MopubBannerSingleton) Mopub banner found into view");
+                    NSLog(@"(MopubBannerSingleton) Mopub banner found into view");
                 }
             }
             
             // if no Mopub Ad in this controller, add one and setup the frame
             if (!isMopubFound) {
-                DDLogVerbose(@"(MopubBannerSingleton) Mopub banner not found into view, adding");
+                NSLog(@"(MopubBannerSingleton) Mopub banner not found into view, adding");
                 [controller.view addSubview:adView];
                 
                 // must be after addsubview
@@ -153,14 +145,14 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
             for (UIView *subView in [controller.view subviews]) {
                 if ([subView isKindOfClass:[GADBannerView class]]) {
                     isAdmobFound = true;
-                    DDLogVerbose(@"(MopubBannerSingleton) Admob banner found into view");
+                    NSLog(@"(MopubBannerSingleton) Admob banner found into view");
                     //[self.adView removeFromSuperview];
                 }
             }
             
             // if no Admob Ad in this controller, add one and setup the frame
             if (!isAdmobFound) {
-                DDLogVerbose(@"(MopubBannerSingleton) Admob banner not found into view, adding");
+                NSLog(@"(MopubBannerSingleton) Admob banner not found into view, adding");
                 [controller.view addSubview:adView];
                 
                 // must be after addsubview
@@ -179,7 +171,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 }
 
 - (void)setupAdFrame:(UIViewController *)controller{
-    //DDLogVerbose(@"setupAdFrame");
+    //NSLog(@"setupAdFrame");
 
     // center X
     [controller.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.adView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f]];
@@ -309,7 +301,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
     
     NSNumber *elapsed = [NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970] - [lastInterstitialTime longValue]];
     
-    DDLogVerbose(@"elapsed since last interstitial:%li", [elapsed longValue]);
+    NSLog(@"elapsed since last interstitial:%li", [elapsed longValue]);
     if ([elapsed longValue] >= ([currentMinimumIntervalTimeInMinutes longValue] * 60.0) ) {
         return YES;
     }
@@ -318,7 +310,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 }
 
 - (void)getAndShowInterstitialWithMinimumTimeIntervalInMinutes:(NSNumber *)minimumIntervalTimeInMinutes{
-   // DDLogVerbose(@"++ getAndShowInterstitialWithMinimumTimeIntervalInMinutes ++");
+   // NSLog(@"++ getAndShowInterstitialWithMinimumTimeIntervalInMinutes ++");
     
     if (isAdsEnabled) {
     
@@ -376,7 +368,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
     // Get the interstitial count
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger mopubInterstitialCount = [[defaults objectForKey:kInterstitialCount] integerValue]+1;
-    //DDLogVerbose(@"getAndShowInterstitial current count:%li every:%li", (long)mopubInterstitialCount, (long)interstitialCount);
+    //NSLog(@"getAndShowInterstitial current count:%li every:%li", (long)mopubInterstitialCount, (long)interstitialCount);
     if (mopubInterstitialCount >= interstitialCount) {
         
         //actualInterstitialController = controller;
@@ -422,7 +414,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 // Do we need this ?
 /*
 - (void)stopBanner{
-    //DDLogVerbose(@"banner stoped and removed from superview");
+    //NSLog(@"banner stoped and removed from superview");
     [self.adView removeFromSuperview];
     self.adView.delegate = nil;
     self.adView = nil;
@@ -431,7 +423,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 */
 
 - (void)disableMopubBanner{
-    //DDLogVerbose(@"banner disabled and removed from superview");
+    //NSLog(@"banner disabled and removed from superview");
     [self.adView removeFromSuperview];
     [(MPAdView *)self.adView setDelegate:nil];
     self.adView = nil;
@@ -447,7 +439,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 #pragma mark - App delegate Foreground / backbroung
 
 - (void)mopubAppDidBecomeActive{
-   // DDLogVerbose(@"** mopubAppDidBecomeActive **");
+   // NSLog(@"** mopubAppDidBecomeActive **");
     if(AutoShowInterstitial && isAdsEnabled){
         [self performSelector:@selector(getAndShowInterstitialWithMinimumTimeIntervalInMinutes:) withObject:[NSNumber numberWithLong:AutoInterstitialTimeBetweenEachInMinutes] afterDelay:AutoInterstitialDelayAfterAppBecomeActive];
     }
@@ -455,11 +447,11 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 
 - (void)mopubAppDidFinishLaunching{
-   // DDLogVerbose(@"** mopubAppDidFinishLaunching **");
+   // NSLog(@"** mopubAppDidFinishLaunching **");
 }
 
 - (void)mopubEnterForeground{
-    DDLogVerbose(@"** mopubEnterForeground **");
+    NSLog(@"** mopubEnterForeground **");
     if (isAdsEnabled) {
         if (actualBannerController) {
             if ([adView isKindOfClass:[MPAdView class]]) {
@@ -469,7 +461,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
                 if (timer) {
                     [self resumeTimer:timer];
                 }else{
-                    DDLogVerbose(@"wow no timer to resume ????");
+                    NSLog(@"wow no timer to resume ????");
                 }
             }
             
@@ -482,7 +474,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
     
 }
 - (void)mopubEnterBackground{
-    DDLogVerbose(@"mopubEnterBackground");
+    NSLog(@"mopubEnterBackground");
     if (self.adView) {
         if ([adView isKindOfClass:[MPAdView class]]) {
             [self.adView stopAutomaticallyRefreshingContents];
@@ -491,17 +483,17 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
             if (timer) {
                 [self pauseTimer:timer];
             }else{
-                DDLogVerbose(@"wow no timer to pause ????");
+                NSLog(@"wow no timer to pause ????");
             }
         }
     }
 }
 
 - (void)mopubBannerShouldDissapear:(UIViewController *)controller{
-    DDLogVerbose(@"(MopubBannerSingletone) mopubBannerShouldDissapear");
+    NSLog(@"(MopubBannerSingletone) mopubBannerShouldDissapear");
     if ([adView superview]) {
         [adView removeFromSuperview];
-        DDLogVerbose(@"(MopubBannerSingletone) mopubBannerShouldDissapear REMOVED");
+        NSLog(@"(MopubBannerSingletone) mopubBannerShouldDissapear REMOVED");
     }
     
     if ([adView isKindOfClass:[MPAdView class]]) {
@@ -518,11 +510,11 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 #pragma mark - Mopub Banner Delegate
 
 - (void)adViewDidLoadAd:(MPAdView *)view{
-    DDLogVerbose(@"(MopubBannerSingletone) Mopub adViewDidLoadAd");
+    NSLog(@"(MopubBannerSingletone) Mopub adViewDidLoadAd");
    
     if (constraintControllerPushingOtherViews.constant == 0) {
         // constraint must give some space to the banner
-       // DDLogVerbose(@"call mobeBannerOnScreen");
+       // NSLog(@"call mobeBannerOnScreen");
         if (isAdsEnabled && actualBannerController) {
             [self moveBannerOnScreen];
         }
@@ -532,19 +524,19 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 }
 
 - (void)adViewDidFailToLoadAd:(MPAdView *)view{
-    DDLogVerbose(@"(MopubBannerSingletone) Mopub adViewDidFailToLoadAd - ask admob");
+    NSLog(@"(MopubBannerSingletone) Mopub adViewDidFailToLoadAd - ask admob");
     [self createAdmobBanner];
 }
 
 - (UIViewController *)viewControllerForPresentingModalView {
-    DDLogVerbose(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
+    NSLog(@"++++ (MopubBannerSingletone) delegate viewControllerForPresentingModalView");
     return actualBannerController;
 }
 
 #pragma mark - Mopub Interstitial Delegate
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial{
-    //DDLogVerbose(@"----------- mopub interstitialDidLoadAd ----------");
+    //NSLog(@"----------- mopub interstitialDidLoadAd ----------");
     if (isAdsEnabled) {
         if (self.interstitial.ready){
             if ([self isInterstitialElapsedTimeOver]) {
@@ -554,14 +546,14 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
             }
             
         }else {
-            //DDLogVerbose(@"----------- The interstitial wasn't ready ----------");
+            //NSLog(@"----------- The interstitial wasn't ready ----------");
             // The interstitial wasn't ready, so continue as usual.
         }
     }
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial{
-    //DDLogVerbose(@"-- error interstitialDidFailToLoadAd - loading admob fallback -");
+    //NSLog(@"-- error interstitialDidFailToLoadAd - loading admob fallback -");
     if (isAdsEnabled) {
         [self createAndLoadAdmobInterstitial];
     }
@@ -570,7 +562,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 #pragma mark - Admob init
 
 - (void)createAdmobBanner{
-    DDLogVerbose(@"createAdmobBanner");
+    NSLog(@"createAdmobBanner");
     [self disableMopubBanner];
     
     if (isAdsEnabled  && actualBannerController) {
@@ -625,11 +617,11 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 #pragma mark - admob Banner delegate
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView{
-    DDLogVerbose(@"admob banner - adViewDidReceiveAd");
+    NSLog(@"admob banner - adViewDidReceiveAd");
     
     if (isAdsEnabled && actualBannerController) {
         if (constraintControllerPushingOtherViews.constant == 0) {
-        // DDLogVerbose(@"call mobeBannerOnScreen");
+        // NSLog(@"call mobeBannerOnScreen");
             [self moveBannerOnScreen];
             
         }
@@ -640,7 +632,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
     
 }
 - (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error{
-    DDLogVerbose(@"admob banner - didFailToReceiveAdWithError");
+    NSLog(@"admob banner - didFailToReceiveAdWithError");
 }
 
 
@@ -648,7 +640,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 /// Called when an interstitial ad request succeeded.
 - (void)interstitialDidReceiveAd:(GADInterstitial *)ad {
-    //DDLogVerbose(@"ADMOB - interstitialDidReceiveAd");
+    //NSLog(@"ADMOB - interstitialDidReceiveAd");
     if (isAdsEnabled) {
         if ([self.admobInterstitial isReady]) {
             if ([self isInterstitialElapsedTimeOver]) {
@@ -663,7 +655,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 /// Called when an interstitial ad request failed.
 - (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
-    //DDLogVerbose(@"ADMOB - interstitialDidFailToReceiveAdWithError: %@", [error localizedDescription]);
+    //NSLog(@"ADMOB - interstitialDidFailToReceiveAdWithError: %@", [error localizedDescription]);
 }
 
 
@@ -687,7 +679,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 
 - (void)moveBannerOnScreen {
-    DDLogVerbose(@"moveBannerOnScreen, banner height:%f", fabs(bannerHeight));
+    NSLog(@"moveBannerOnScreen, banner height:%f", fabs(bannerHeight));
     if (isAdsEnabled && actualBannerController) {
         [actualBannerController.view layoutIfNeeded];
         
@@ -747,7 +739,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 #pragma mark - Admob timer
 
 - (void)startTimer{
-    DDLogVerbose(@"-- start admob timer --");
+    NSLog(@"-- start admob timer --");
     if (isAdsEnabled) {
         [self stopTimer];
         timer = [NSTimer scheduledTimerWithTimeInterval:AdmobRefreshInterval target:self selector:@selector(admobTimerTick) userInfo:nil repeats:NO];
@@ -761,7 +753,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 }
 
 - (void)admobTimerTick {
-    DDLogVerbose(@"admob tick ask another banner");
+    NSLog(@"admob tick ask another banner");
     if (actualBannerController) {
         [self.adView setRootViewController:actualBannerController];
         
@@ -774,14 +766,14 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 }
 
 - (void)pauseTimer:(NSTimer *)mTimer {
-    DDLogVerbose(@"-- pause admob timer --");
+    NSLog(@"-- pause admob timer --");
     pauseStart = [NSDate dateWithTimeIntervalSinceNow:0];
     previousFireDate = [mTimer fireDate];
     [mTimer setFireDate:[NSDate distantFuture]];
 }
 
 - (void)resumeTimer:(NSTimer *)mTimer {
-    DDLogVerbose(@"-- resume admob timer --");
+    NSLog(@"-- resume admob timer --");
     float pauseTime = -1*[pauseStart timeIntervalSinceNow];
     [mTimer setFireDate:[previousFireDate initWithTimeInterval:pauseTime sinceDate:previousFireDate]];
     
