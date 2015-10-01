@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Mopub-helper"
-  s.version          = "4.9"
+  s.version          = "4.91"
   s.summary          = "A Mopub helper to add Advertising very quickly."
 
   s.homepage         = "https://github.com/linked67/mopub-helper"
@@ -37,7 +37,7 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
-  s.dependency 'Google-Mobile-Ads-SDK', '~> 7.0'
-  s.dependency 'mopub-ios-sdk'
+  # s.dependency 'Google-Mobile-Ads-SDK', '~> 7.0'
+  # s.dependency 'mopub-ios-sdk'
   
 end
