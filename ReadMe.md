@@ -3,6 +3,10 @@ New version 4 with Admob fallback (interstitial and banners)
 How to use
 ==========
 
+Intall with pod:
+
+        pod 'Mopub-helper', :git => 'https://github.com/linked67/mopub-helper.git'
+
 Setup
 -----
 
