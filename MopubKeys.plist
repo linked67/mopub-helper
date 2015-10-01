@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ExtraSpace</key>
+	<integer>0</integer>
+	<key>AppearAnimationTime</key>
+	<real>0</real>
+	<key>AdsEnabled</key>
+	<true/>
+	<key>AutoShowInterstitial</key>
+	<true/>
+	<key>AutoInterstitialTimeBetweenEachInMinutes</key>
+	<integer>60</integer>
+	<key>AutoInterstitialDelayAfterAppBecomeActive</key>
+	<integer>5</integer>
+	<key>AdmobRefreshInterval</key>
+	<integer>60</integer>
+	<key>kMopubIphoneBanner</key>
+	<string>0f5aef2ec3cb11e295fa123138070049</string>
+	<key>kMopubIphoneInterstitialPortrait</key>
+	<string>1c37c618c3cb11e295fa123138070049</string>
+	<key>kMopubIphoneInterstitialLandscape</key>
+	<string>9fdadacd7fa84002967c2b4a1eaad0f2</string>
+	<key>kMopubTabletLeaderboard</key>
+	<string>d33fd41efbf24781b9a645e7791b1d7b</string>
+	<key>kMopubTabletInterstitialPortrait</key>
+	<string>0c7a2330571649378586df400261c143</string>
+	<key>kMopubTabletInterstitialLandscape</key>
+	<string>1df89bd531b04006bb84b0985d91c4bf</string>
+	<key>kAdmobIphoneBanner</key>
+	<string>ca-app-pub-4607823378897293/8976542968</string>
+	<key>kAdmobTabletLeaderboard</key>
+	<string>ca-app-pub-4607823378897293/2033387367</string>
+	<key>kAdmobIphoneInterstitialProtrait</key>
+	<string>ca-app-pub-4607823378897293/1453276167</string>
+	<key>kAdmobIphoneInterstitialLandscape</key>
+	<string>ca-app-pub-4607823378897293/6463586967</string>
+	<key>kAdmobTabletInterstitialProtrait</key>
+	<string>ca-app-pub-4607823378897293/9417053366</string>
+	<key>kAdmobTabletInterstitialLandscape</key>
+	<string>ca-app-pub-4607823378897293/3370519766</string>
+</dict>
+</plist>

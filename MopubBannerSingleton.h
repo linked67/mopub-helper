@@ -4,14 +4,14 @@
 //  Created by bruno heitz on 28/09/13.
 //  Copyright (c) 2013 bruno heitz. All rights reserved.
 //
-//  V 4.7
+//  V 4.9
 //
 //  --------------------- How to use ------------------------------
 //
 //  Only need a constraint in Interface Builder between
 //  top (or bottom) layout guide and a view
 //
-//  Fill the MopubKeys file with good settings
+//  Fill the MopubKeys.plist file with your mopub/admob keys
 //
 //  -----------------------------------------------------------------
 
@@ -20,21 +20,7 @@
 #import "MPAdView.h"
 #import "MPInterstitialAdController.h"
 
-// header with the keys and params
-#import "MopubKeys.h"
-
 #import <GoogleMobileAds/GoogleMobileAds.h>
-
-/*
-// Admob interstitial
-#import <GoogleMobileAds/GADInterstitial.h>
-#import <GoogleMobileAds/GADInterstitialDelegate.h>
-
-// Admob banner
-#import <GoogleMobileAds/GADBannerView.h>
-#import <GoogleMobileAds/GADRequest.h>
-*/
-
 
 
 @interface MopubBannerSingleton : UIViewController <MPAdViewDelegate, MPInterstitialAdControllerDelegate, GADInterstitialDelegate>{
@@ -55,6 +41,7 @@
 }
 
 + (MopubBannerSingleton *)sharedBanners;
++ (id)configValueForKey:(NSString *)key;
 
 - (void)getMopubBanner:(UIViewController *)controller onTop:(BOOL)onTop constraint:(NSLayoutConstraint *)constraint;
 - (void)getAndShowInterstitialWithMinimumTimeIntervalInMinutes:(NSNumber *)minimumIntervalTimeInMinutes;
@@ -73,6 +60,5 @@
 @property(nonatomic, strong) GADInterstitial *admobInterstitial;
 
 @property (nonatomic) BOOL isAdsEnabled;
-
 
 @end

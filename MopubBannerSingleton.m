@@ -9,8 +9,6 @@
 
 #import "MopubBannerSingleton.h"
 
-#import "AppDelegate.h"
-
 @implementation MopubBannerSingleton
 
 @synthesize adView;
@@ -29,10 +27,24 @@
     return shared;
 }
 
++ (id)configValueForKey:(NSString *)key{
+    NSDictionary *dicConfig = [NSDictionary dictionaryWithContentsOfFile:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"MopubKeys.plist"]];
+    if (!dicConfig) {
+        [NSException raise:@"Mopub helper exception" format:@"Please check that the Mopubkeys.plist file exist !"];
+    }
+    
+    if (dicConfig[key]) {
+        return dicConfig[key];
+    }else{
+        [NSException raise:@"Mopub helper exception" format:@"Please check the key %@ in the Mopubkeys.plist file exist", key];
+    }
+    //return dicConfig[key];
+}
+
 -(id)init {
     if (self = [super init]) {
         hadBanner = FALSE;
-        isAdsEnabled = AdsEnabled;
+        isAdsEnabled = [[MopubBannerSingleton configValueForKey:@"AdsEnabled"] boolValue];
         
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:[NSNumber numberWithInteger:0] forKey:kInterstitialCount];
@@ -92,10 +104,10 @@
             //[self createAdmobBanner];
             
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-                self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubTabletLeaderboard
+                self.adView = [[MPAdView alloc] initWithAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubTabletLeaderboard"]
                                                             size:MOPUB_LEADERBOARD_SIZE];
             }else{
-                self.adView = [[MPAdView alloc] initWithAdUnitId:kMopubIphoneBanner
+                self.adView = [[MPAdView alloc] initWithAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubIphoneBanner"]
                                                             size:MOPUB_BANNER_SIZE];
             }
             
@@ -200,7 +212,7 @@
         
         
         if (isOnTopOfTheScreen){
-            bannerHeight = -MOPUB_LEADERBOARD_SIZE.height + ExtraSpace;
+            bannerHeight = -MOPUB_LEADERBOARD_SIZE.height + [[MopubBannerSingleton configValueForKey:@"ExtraSpace"] floatValue];
 
             // top adview and top screen
             constraintAdviewToGuide = [NSLayoutConstraint constraintWithItem:self.adView
@@ -213,7 +225,7 @@
         
             
         }else{
-            bannerHeight = MOPUB_LEADERBOARD_SIZE.height + ExtraSpace;
+            bannerHeight = MOPUB_LEADERBOARD_SIZE.height + [[MopubBannerSingleton configValueForKey:@"ExtraSpace"] floatValue];
 
             // bottom adview and bottom screen
             constraintAdviewToGuide = [NSLayoutConstraint constraintWithItem:self.adView
@@ -248,7 +260,7 @@
                                                                      constant:320.0]];
         
         if (isOnTopOfTheScreen){
-            bannerHeight = -MOPUB_BANNER_SIZE.height + ExtraSpace;
+            bannerHeight = -MOPUB_BANNER_SIZE.height + [[MopubBannerSingleton configValueForKey:@"ExtraSpace"] floatValue];
             
             // top adview and top screen
             constraintAdviewToGuide = [NSLayoutConstraint constraintWithItem:self.adView
@@ -260,7 +272,7 @@
                                                                          constant:0.0f];
             
         }else{
-            bannerHeight = MOPUB_BANNER_SIZE.height + ExtraSpace;
+            bannerHeight = MOPUB_BANNER_SIZE.height + [[MopubBannerSingleton configValueForKey:@"ExtraSpace"] floatValue];
             
             // bottom adview and bottom screen
             constraintAdviewToGuide = [NSLayoutConstraint constraintWithItem:self.adView
@@ -323,21 +335,21 @@
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
                 // The device is an iPad running iPhone 3.2 or later.
                 if ([self isPortrait]) {
-                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialPortrait];
-                    currentAdmobInterstitialID = kAdmobTabletInterstitialProtrait;
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubTabletInterstitialPortrait"]];
+                    currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobTabletInterstitialProtrait"];
                 }else{
-                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialLandscape];
-                    currentAdmobInterstitialID = kAdmobTabletInterstitialLandscape;
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubTabletInterstitialLandscape"]];
+                    currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobTabletInterstitialLandscape"];
                 }
                 
             }else {
                 // The device is an iPhone or iPod touch.
                 if ([self isPortrait]) {
-                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialPortrait];
-                    currentAdmobInterstitialID = kAdmobIphoneInterstitialProtrait;
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubIphoneInterstitialPortrait"]];
+                    currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobIphoneInterstitialProtrait"];
                 }else{
-                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialLandscape];
-                    currentAdmobInterstitialID = kAdmobIphoneInterstitialLandscape;
+                    self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubIphoneInterstitialLandscape"]];
+                    currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobIphoneInterstitialLandscape"];
                 }
             }
             
@@ -376,21 +388,21 @@
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             // The device is an iPad running iPhone 3.2 or later.
             if ([self isPortrait]) {
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialPortrait];
-                currentAdmobInterstitialID = kAdmobTabletInterstitialProtrait;
+                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubTabletInterstitialPortrait"]];
+                currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobTabletInterstitialProtrait"];
             }else{
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubTabletInterstitialLandscape];
-                currentAdmobInterstitialID = kAdmobTabletInterstitialLandscape;
+                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubTabletInterstitialLandscape"]];
+                currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobTabletInterstitialLandscape"];
             }
             
         }else {
             // The device is an iPhone or iPod touch.
             if ([self isPortrait]) {
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialPortrait];
-                currentAdmobInterstitialID = kAdmobIphoneInterstitialProtrait;
+                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubIphoneInterstitialPortrait"]];
+                currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobIphoneInterstitialProtrait"];
             }else{
-                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:kMopubIphoneInterstitialLandscape];
-                currentAdmobInterstitialID = kAdmobIphoneInterstitialLandscape;
+                self.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:[MopubBannerSingleton configValueForKey:@"kMopubIphoneInterstitialLandscape"]];
+                currentAdmobInterstitialID = [MopubBannerSingleton configValueForKey:@"kAdmobIphoneInterstitialLandscape"];
             }
         }
         
@@ -440,8 +452,8 @@
 
 - (void)mopubAppDidBecomeActive{
    // //NSLog(@"** mopubAppDidBecomeActive **");
-    if(AutoShowInterstitial && isAdsEnabled){
-        [self performSelector:@selector(getAndShowInterstitialWithMinimumTimeIntervalInMinutes:) withObject:[NSNumber numberWithLong:AutoInterstitialTimeBetweenEachInMinutes] afterDelay:AutoInterstitialDelayAfterAppBecomeActive];
+    if([[MopubBannerSingleton configValueForKey:@"AutoShowInterstitial"] boolValue] && isAdsEnabled){
+        [self performSelector:@selector(getAndShowInterstitialWithMinimumTimeIntervalInMinutes:) withObject:[NSNumber numberWithLong:[[MopubBannerSingleton configValueForKey:@"AutoInterstitialTimeBetweenEachInMinutes"] floatValue]] afterDelay:[[MopubBannerSingleton configValueForKey:@"AutoInterstitialDelayAfterAppBecomeActive"] floatValue]];
     }
 }
 
@@ -571,10 +583,10 @@
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
                 
                 self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeLeaderboard];
-                [self.adView setAdUnitID:kAdmobTabletLeaderboard];
+                [self.adView setAdUnitID:[MopubBannerSingleton configValueForKey:@"kAdmobTabletLeaderboard"]];
             }else{
                 self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];
-                [self.adView setAdUnitID:kAdmobIphoneBanner];
+                [self.adView setAdUnitID:[MopubBannerSingleton configValueForKey:@"kAdmobIphoneBanner"]];
             }
             
             [(GADBannerView *)self.adView setDelegate:(id)self];
@@ -688,7 +700,7 @@
         
         
         // Animate linear
-        [UIView animateWithDuration:AppearAnimationTime
+        [UIView animateWithDuration:[[MopubBannerSingleton configValueForKey:@"AppearAnimationTime"] floatValue]
                          animations:^{
                              [actualBannerController.view layoutIfNeeded]; // Called on parent view
                          }];
@@ -742,7 +754,7 @@
     //NSLog(@"-- start admob timer --");
     if (isAdsEnabled) {
         [self stopTimer];
-        timer = [NSTimer scheduledTimerWithTimeInterval:AdmobRefreshInterval target:self selector:@selector(admobTimerTick) userInfo:nil repeats:NO];
+        timer = [NSTimer scheduledTimerWithTimeInterval:[[MopubBannerSingleton configValueForKey:@"AdmobRefreshInterval"] floatValue] target:self selector:@selector(admobTimerTick) userInfo:nil repeats:NO];
     }
     
 }

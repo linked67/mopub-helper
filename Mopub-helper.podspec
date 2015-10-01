@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Mopub-helper"
-  s.version          = "4.8"
+  s.version          = "4.9"
   s.summary          = "A Mopub helper to add Advertising very quickly."
 
   s.homepage         = "https://github.com/linked67/mopub-helper"
