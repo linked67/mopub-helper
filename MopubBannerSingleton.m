@@ -15,7 +15,7 @@
 
 
 // below imports
-//static int ddLogLevel = LOG_LEVEL_VERBOSE;
+//static int ddLogLevel = DDLogLevelAll;
 static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 
@@ -591,7 +591,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
                 
                 GADRequest *request = [GADRequest request];
                 // Enable test ads on simulators.
-                request.testDevices = @[ GAD_SIMULATOR_ID ];
+                request.testDevices = @[ kDFPSimulatorID ]; // 7.2 kGADSimulatorID
                 [(GADBannerView *)self.adView loadRequest:request];
                 
             }
@@ -607,14 +607,15 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 - (void)createAndLoadAdmobInterstitial{
     if (isAdsEnabled) {
-        self.admobInterstitial = [[GADInterstitial alloc] init];
+//        self.admobInterstitial = [[GADInterstitial alloc] init];
+        self.admobInterstitial = [[GADInterstitial alloc] initWithAdUnitID:currentAdmobInterstitialID];
         self.admobInterstitial.delegate = (id)self;
-        self.admobInterstitial.adUnitID = currentAdmobInterstitialID;
+  //      self.admobInterstitial.adUnitID = currentAdmobInterstitialID;
         
         GADRequest *request = [GADRequest request];
         
         // Requests test ads on simulators.
-        request.testDevices = @[ GAD_SIMULATOR_ID ];
+        request.testDevices = @[ kDFPSimulatorID ];
         
         [self.admobInterstitial loadRequest:request];
     }
@@ -686,11 +687,11 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
 
 
 - (void)moveBannerOnScreen {
-    DDLogVerbose(@"moveBannerOnScreen, banner height:%i", abs(bannerHeight));
+    DDLogVerbose(@"moveBannerOnScreen, banner height:%f", fabs(bannerHeight));
     if (isAdsEnabled && actualBannerController) {
         [actualBannerController.view layoutIfNeeded];
         
-        constraintControllerPushingOtherViews.constant = abs(bannerHeight);
+        constraintControllerPushingOtherViews.constant = fabs(bannerHeight);
         constraintAdviewToGuide.constant = 0.0f;
         
         
@@ -766,7 +767,7 @@ static int ddLogLevel = DEFAULT_LOG_LEVEL;
         
         GADRequest *request = [GADRequest request];
         // Enable test ads on simulators.
-        request.testDevices = @[ GAD_SIMULATOR_ID ];
+        request.testDevices = @[ kDFPSimulatorID ];
         [(GADBannerView *)self.adView loadRequest:request];
     }
     

@@ -23,14 +23,17 @@
 // header with the keys and params
 #import "MopubKeys.h"
 
+#import <GoogleMobileAds/GoogleMobileAds.h>
+
+/*
 // Admob interstitial
-#import "GADInterstitial.h"
-#import "GADInterstitialDelegate.h"
+#import <GoogleMobileAds/GADInterstitial.h>
+#import <GoogleMobileAds/GADInterstitialDelegate.h>
 
 // Admob banner
-#import "GADBannerView.h"
-#import "GADRequest.h"
-
+#import <GoogleMobileAds/GADBannerView.h>
+#import <GoogleMobileAds/GADRequest.h>
+*/
 
 
 
